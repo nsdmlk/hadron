@@ -6,7 +6,7 @@ CFLAGS = -m32 -ffreestanding -nostdlib -nostdinc -fno-pie -fno-stack-protector
 ASMFLAGS = -f elf32
 LDFLAGS = -m elf_i386 -T linker.ld
 
-OBJS = boot.o kernel.o idt.o vga.o isr.o pic.o gdt.o
+OBJS = boot.o kernel.o idt.o vga.o isr.o pic.o gdt.o keyboard.o shell.o
 
 all: hadron.iso
 
@@ -27,6 +27,12 @@ vga.o: vga.c vga.h
 
 pic.o: pic.c pic.h
 	$(CC) $(CFLAGS) -c pic.c -o pic.o
+
+keyboard.o: keyboard.c keyboard.h
+	$(CC) $(CFLAGS) -c keyboard.c -o keyboard.o
+
+shell.o: shell.c shell.h
+	$(CC) $(CFLAGS) -c shell.c -o shell.o
 
 kernel.o: kernel.c
 	$(CC) $(CFLAGS) -c kernel.c -o kernel.o

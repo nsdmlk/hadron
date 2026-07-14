@@ -12,10 +12,14 @@ isr32:
     popad
     iretd
 
+extern keyboard_handler
+
 isr33:
     pushad
-    in al, 0x60         
-    mov byte [0xB8000 + 8], al  
+    in al, 0x60
+    push eax
+    call keyboard_handler
+    add esp, 4
     mov al, 0x20
     out 0x20, al
     popad
