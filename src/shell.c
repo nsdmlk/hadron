@@ -88,7 +88,7 @@ int shell_execute(const char* input, int current_y) {
     } else if (strcmp(name, "clear") == 0) {
         char* v = (char*) 0xB8000;
         for (int j = 0; j < 25 * 80 * 2; j++) v[j] = 0;
-        shell_y = 0;
+        shell_y = -1;
     } else if (strcmp(name, "off") == 0) {
         shell_print("Shutting down...");
         asm volatile("hlt");
