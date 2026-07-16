@@ -10,6 +10,6 @@ typedef struct {
 } Command;
 
 void shell_init(void);
-void shell_execute(const char* input, int current_y);
+int shell_execute(const char* input, int current_y);
 
 #endif

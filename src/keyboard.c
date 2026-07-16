@@ -54,7 +54,7 @@ static void putchar_at(char c, int x, int y) {
 }
 
 void keyboard_init(void) {
-    char* prompt = "hdr@hadron:~$ ";
+    char* prompt = "hadron@shell$ |  ";
     for (int i = 0; prompt[i]; i++) {
         putchar_at(prompt[i], cursor_x++, 0);
     }
@@ -87,17 +87,16 @@ void keyboard_handler(unsigned char scancode) {
         }
     } else if (c == '\n') {  // Enter
         buffer[buf_pos] = '\0';
-        shell_execute(buffer, cursor_y + 1);      
+        int line_used = shell_execute(buffer, cursor_y + 1);      
         buf_pos = 0;
         
         for (int j = 0; j < buf_pos; j++) buffer[j] = '\0';
         buf_pos = 0;
     
         cursor_x = 0;
-        cursor_y++;
+        cursor_y = cursor_y + line_used + 1;
         if (cursor_y >= 25) scroll_screen();
-        
-        char* prompt = "hdr@hadron:~$ ";
+        char* prompt = "hadron@shell$ |  ";
         for (int i = 0; prompt[i]; i++) {
             putchar_at(prompt[i], cursor_x++, cursor_y);
         }
