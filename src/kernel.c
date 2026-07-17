@@ -3,6 +3,7 @@
 #include "gdt.h"
 #include "keyboard.h"
 #include "memory.h"
+#include "paging.h"
 
 unsigned int total_memory_mb = 0;
 
@@ -10,6 +11,7 @@ void kernel_main(unsigned int magic, unsigned int* multiboot_info) {
     char* video = (char*) 0xB8000;
 
     gdt_load();
+    paging_init();
     pic_init();
     idt_init();
     keyboard_init();
