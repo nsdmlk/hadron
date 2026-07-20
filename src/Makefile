@@ -6,7 +6,7 @@ CFLAGS = -m32 -ffreestanding -nostdlib -nostdinc -fno-pie -fno-stack-protector
 ASMFLAGS = -f elf32
 LDFLAGS = -m elf_i386 -T linker.ld
 
-OBJS = boot.o kernel.o idt.o vga.o isr.o pic.o gdt.o keyboard.o shell.o memory.o paging.o
+OBJS = boot.o kernel.o idt.o vga.o isr.o pic.o gdt.o keyboard.o shell.o memory.o paging.o ata.o fs.o
 
 all: hadron.iso
 
@@ -31,6 +31,12 @@ pic.o: pic.c pic.h
 paging.o: paging.c paging.h
 	$(CC) $(CFLAGS) -c paging.c -o paging.o
 
+ata.o: ata.c ata.h
+	$(CC) $(CFLAGS) -c ata.c -o ata.o
+
+fs.o: fs.c fs.h
+	$(CC) $(CFLAGS) -c fs.c -o fs.o
+
 keyboard.o: keyboard.c keyboard.h
 	$(CC) $(CFLAGS) -c keyboard.c -o keyboard.o
 
@@ -46,6 +52,9 @@ kernel.o: kernel.c
 hadron.bin: $(OBJS)
 	$(LD) $(LDFLAGS) $(OBJS) -o hadron.bin
 
+disk.img:
+	dd if=/dev/zero of=disk.img bs=512 count=32768  # 16 MB
+
 hadron.iso: hadron.bin
 	mkdir -p iso/boot/grub
 	cp hadron.bin iso/boot/
@@ -57,8 +66,8 @@ hadron.iso: hadron.bin
 	echo '}' >> iso/boot/grub/grub.cfg
 	i686-elf-grub-mkrescue -o hadron.iso iso
 
-run: hadron.iso
-	qemu-system-i386 -cdrom hadron.iso
+run: hadron.iso disk.img
+	qemu-system-i386 -cdrom hadron.iso -drive file=disk.img,format=raw,if=ide
 
 clean:
 	rm -f *.o *.bin *.iso

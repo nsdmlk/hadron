@@ -1,5 +1,6 @@
 #include "shell.h"
 #include "memory.h"
+#include "fs.h"
 
 static int shell_x = 0;
 static int shell_y = 1;
@@ -92,7 +93,7 @@ int shell_execute(const char* input, int current_y) {
         while (i > 0) shell_putchar(buf[--i]);
         shell_print(" MB");
     } else if (strcmp(name, "info") == 0) {
-        shell_print("Commands:\n    hadron - check OS version\n    display - display 'text'\n    clear - clear window\n    mem - create emory block\n    off - kill terminal");
+        shell_print("Commands:\n    hadron - check OS version\n    display - display 'text'\n    clear - clear window\n    mem - create emory block\n    create - create file or directory\n    list - show files\n    off - kill terminal");
     } else if (strcmp(name, "display") == 0) {
         shell_print(cmd.count > 1 ? cmd.tokens[1] : "null");
     } else if (strcmp(name, "clear") == 0) {
@@ -103,34 +104,27 @@ int shell_execute(const char* input, int current_y) {
         shell_print("Shutting down...");
         asm volatile("hlt");
     } else if (strcmp(name, "mem") == 0) {
-        char* a = (char*) malloc(50);
-        char* b = (char*) malloc(50);
-        char* c = (char*) malloc(50);
-    
-        char* msg_a = "Block A OK";
-        char* msg_b = "Block B OK";
-        char* msg_c = "Block C OK";
-    
-        for (int i = 0; msg_a[i]; i++) a[i] = msg_a[i];
-        for (int i = 0; msg_b[i]; i++) b[i] = msg_b[i];
-        for (int i = 0; msg_c[i]; i++) c[i] = msg_c[i];
-    
-        shell_print(a);
-        shell_print(" | ");
-        shell_print(b);
-        shell_print(" | ");
-        shell_print(c);
-    
-        free(a);
-        free(b);
-        free(c);
-    
-        char* d = (char*) malloc(50);
-        char* msg_d = "Reuse OK";
-        for (int i = 0; msg_d[i]; i++) d[i] = msg_d[i];
-        shell_print(" | ");
-        shell_print(d);
-        free(d);
+        shell_print("success");
+    } else if (strcmp(name, "create") == 0) {
+        if (cmd.count > 1) {
+            fs_create(cmd.tokens[1]);
+            shell_print("Created: ");
+            shell_print(cmd.tokens[1]);
+        } else {
+            shell_print("Usage: create <filename>");
+        }
+    } else if (strcmp(name, "list") == 0) {
+        file_entry_t* files = fs_get_table();
+        shell_print("Files: ");
+        int found = 0;
+        for (int i = 0; i < MAX_FILES; i++) {
+            if (files[i].name[0] != '\0') {
+                shell_print(files[i].name);
+                shell_print(" ");
+                found++;
+            }
+        }
+        if (!found) shell_print("(empty)");
     } else {
         shell_print("Unknown command, use info to check available commands");
     }
